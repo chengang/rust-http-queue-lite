@@ -1,4 +1,12 @@
 [root]
 name = "http-queue-lite"
 version = "0.1.0"
+dependencies = [
+ "threadpool 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "threadpool"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 

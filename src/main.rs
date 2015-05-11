@@ -1,3 +1,7 @@
+extern crate threadpool;
+
+use threadpool::ThreadPool;
+
 use std::env;
 use std::collections::HashMap;
 use std::net::{TcpListener, TcpStream};
@@ -181,13 +185,15 @@ fn handle_client(mut stream: TcpStream, mut tasks: MutexGuard<Vec<String>>) {
 fn main() {
     let listener = TcpListener::bind("0.0.0.0:4321").unwrap();
     let tasks: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+    let pool = ThreadPool::new(4);
 
     println!("HTTP Queue Lite Started.");
     for stream in listener.incoming() {
         let tasks = tasks.clone();
         match stream {
             Ok(stream) => {
-                thread::spawn(move|| {
+                //thread::spawn(move|| {
+                pool.execute(move|| {
                     let tasks = tasks.lock().unwrap();
                     handle_client(stream, tasks);
                 });
