@@ -1,1 +1,3 @@
-Usage: http-queue-lite <ip> <port>
+Usage
+-----
+    http-queue-lite <ip> <port>
