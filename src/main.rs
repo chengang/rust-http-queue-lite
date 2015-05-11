@@ -1,3 +1,4 @@
+use std::env;
 use std::collections::HashMap;
 use std::net::{TcpListener, TcpStream};
 use std::io::prelude::*;
@@ -145,30 +146,41 @@ fn get_request_info(stream: &TcpStream) -> RequestInfo {
     return request_info;
 }
 
-//fn basename(filename: String) -> String {
-//    let mut v: Vec<&str> = filename.split('/').collect();
-//    return v.pop().unwrap().to_string();
-//}
-
 fn handle_client(mut stream: TcpStream, mut tasks: MutexGuard<Vec<String>>) {
     let request_info = get_request_info(&stream);
 
+    let mut response = String::new();
     if request_info.request_script.contains("add") {
         tasks.insert(0, request_info.query_string);
-        let _ =  stream.write("added ok".as_bytes());
+        response.push_str("HTTP/1.0 200 OK\r\n");
+        response.push_str("Server: HTTPQ\r\n");
+        response.push_str("\r\n");
+        response.push_str("added ok");
+        response.push_str("\r\n");
     } else if request_info.request_script.contains("get") {
+        response.push_str("HTTP/1.0 200 OK\r\n");
+        response.push_str("Server: HTTPQ\r\n");
+        response.push_str("\r\n");
         if tasks.len() > 0 {
             let task = tasks.pop().unwrap();
-            let _ = stream.write(task.as_bytes());
+            response = format!("{}{}", response, task);
         } else {
-            let _ = stream.write("queue empty".as_bytes());
+            response.push_str("queue empty");
         }
+        response.push_str("\r\n");
+    } else {
+        response.push_str("HTTP/1.0 404 Not Found\r\n");
+        response.push_str("Server: HTTPQ\r\n");
+        response.push_str("\r\n");
+        response.push_str("Not Found");
+        response.push_str("\r\n");
     }
+    let _ =  stream.write(response.as_bytes());
 }
 
 fn main() {
-    let tasks: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
     let listener = TcpListener::bind("0.0.0.0:4321").unwrap();
+    let tasks: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
 
     println!("HTTP Queue Lite Started.");
     for stream in listener.incoming() {
