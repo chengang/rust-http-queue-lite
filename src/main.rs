@@ -1,15 +1,28 @@
+extern crate rustc_serialize;
+extern crate docopt;
 extern crate threadpool;
 
+use docopt::Docopt;
 use threadpool::ThreadPool;
 
-use std::env;
 use std::collections::HashMap;
 use std::net::{TcpListener, TcpStream};
 use std::io::prelude::*;
-use std::thread;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::Arc;
+use std::net::Ipv4Addr;
+
+static USAGE: &'static str = "
+Usage: http-queue-lite <ip> <port>
+";
+
+#[derive(RustcDecodable, Debug)]
+struct Args {
+    arg_ip: String,
+    arg_port: u16,
+}
+
 
 #[allow(dead_code)]
 struct RemoteAddr {
@@ -183,16 +196,20 @@ fn handle_client(mut stream: TcpStream, mut tasks: MutexGuard<Vec<String>>) {
 }
 
 fn main() {
-    let listener = TcpListener::bind("0.0.0.0:4321").unwrap();
+    let args: Args = Docopt::new(USAGE)
+        .and_then(|d| d.decode())
+        .unwrap_or_else(|e| e.exit());
+    let listener_ip = args.arg_ip.parse::<Ipv4Addr>().unwrap();
+
+    let listener = TcpListener::bind((listener_ip, args.arg_port)).unwrap();
     let tasks: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
-    let pool = ThreadPool::new(4);
+    let pool = ThreadPool::new(32);
 
     println!("HTTP Queue Lite Started.");
     for stream in listener.incoming() {
         let tasks = tasks.clone();
         match stream {
             Ok(stream) => {
-                //thread::spawn(move|| {
                 pool.execute(move|| {
                     let tasks = tasks.lock().unwrap();
                     handle_client(stream, tasks);

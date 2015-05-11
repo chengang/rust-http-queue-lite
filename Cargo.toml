@@ -5,4 +5,5 @@ authors = ["Chen Gang <chengang@cpan.org>"]
 
 [dependencies]
 threadpool = "0.1"
-
+docopt = "*"
+rustc-serialize = "*"
