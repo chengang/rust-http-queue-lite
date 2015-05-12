@@ -1,17 +1,17 @@
 SYNOPSIS
 ------
 
-    [shell]# http-queue-lite <ip> <port>
+    [bash]# http-queue-lite 127.0.0.1 4321
     HTTP Queue Lite Started.
-    [shell]# curl http://127.0.0.1:4321/get
+    [bash]# curl http://127.0.0.1:4321/get
     queue empty
-    [shell]# curl http://127.0.0.1:4321/add?task1
+    [bash]# curl http://127.0.0.1:4321/add?task1
     added ok
-    [shell]# curl http://127.0.0.1:4321/add?task2
+    [bash]# curl http://127.0.0.1:4321/add?task2
     added ok
-    [shell]# curl http://127.0.0.1:4321/get
+    [bash]# curl http://127.0.0.1:4321/get
     task1
-    [shell]# curl http://127.0.0.1:4321/get
+    [bash]# curl http://127.0.0.1:4321/get
     task2
 
 
@@ -25,7 +25,7 @@ INSTALL
     cargo build --release
     install target/release/http-queue-lite /usr/sbin/
 
-USEAGE
+USAGE
 ------
 
     http-queue-lite <listen_ip> <listen_port>
