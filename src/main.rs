@@ -112,14 +112,14 @@ fn get_request_line(stream: &TcpStream) -> RequestLine {
             }
         }
     }
-    
+
     let request_line = RequestLine {
         method: method, 
-        request_uri: request_uri, 
-        protocol_version: protocol_version,
-        request_script: request_script,
-        query_string: query_string,
-        get_argv: get_argv,
+            request_uri: request_uri, 
+            protocol_version: protocol_version,
+            request_script: request_script,
+            query_string: query_string,
+            get_argv: get_argv,
     };
     return request_line;
 }
@@ -150,15 +150,15 @@ fn get_request_info(stream: &TcpStream) -> RequestInfo {
     let request_header = get_request_header(&stream);
     let remote_addr = get_remote_addr(&stream);
     let request_info = RequestInfo {
-            remote_ip: remote_addr.ip,
-            remote_port: remote_addr.port,
-            method: request_line.method,
-            request_uri: request_line.request_uri,
-            request_script: request_line.request_script,
-            query_string: request_line.query_string,
-            protocol_version: request_line.protocol_version,
-            get_argv: request_line.get_argv,
-            header: request_header,
+        remote_ip: remote_addr.ip,
+        remote_port: remote_addr.port,
+        method: request_line.method,
+        request_uri: request_line.request_uri,
+        request_script: request_line.request_script,
+        query_string: request_line.query_string,
+        protocol_version: request_line.protocol_version,
+        get_argv: request_line.get_argv,
+        header: request_header,
     };
     return request_info;
 }
@@ -166,36 +166,34 @@ fn get_request_info(stream: &TcpStream) -> RequestInfo {
 fn handle_client(mut stream: TcpStream, mut tasks: MutexGuard<Vec<String>>) {
     let request_info = get_request_info(&stream);
 
-    let mut response = String::new();
+    let mut body = String::new();
+    let mut status = String::new();
     if request_info.request_script.contains("add") {
-        response.push_str("HTTP/1.0 200 OK\r\n");
-        response.push_str("Server: HTTPQ\r\n");
-        response.push_str("\r\n");
+        status.push_str("200 OK");
         if tasks.len() < 10000000 {
             tasks.insert(0, request_info.query_string);
-            response.push_str("added ok");
+            body.push_str("added ok");
         } else {
-            response.push_str("queue full");
+            body.push_str("queue full");
         }
-        response.push_str("\r\n");
     } else if request_info.request_script.contains("get") {
-        response.push_str("HTTP/1.0 200 OK\r\n");
-        response.push_str("Server: HTTPQ\r\n");
-        response.push_str("\r\n");
+        status.push_str("200 OK");
         if tasks.len() > 0 {
             let task = tasks.pop().unwrap();
-            response = format!("{}{}", response, task);
+            body = format!("{}", task);
         } else {
-            response.push_str("queue empty");
+            body.push_str("queue empty");
         }
-        response.push_str("\r\n");
     } else {
-        response.push_str("HTTP/1.0 404 Not Found\r\n");
-        response.push_str("Server: HTTPQ\r\n");
-        response.push_str("\r\n");
-        response.push_str("Not Found");
-        response.push_str("\r\n");
+        status.push_str("404 Not Found");
+        body.push_str("Not Found");
     }
+    let response = format!("HTTP/1.0 {}\r\n\
+                       Server: HTTPQ\r\n\
+                       Content-Length: {}\r\n\
+                       \r\n\
+                       {}\r\n", 
+                       status, body.len()+2, body);
     let _ =  stream.write(response.as_bytes());
 }
 
