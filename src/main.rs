@@ -168,11 +168,15 @@ fn handle_client(mut stream: TcpStream, mut tasks: MutexGuard<Vec<String>>) {
 
     let mut response = String::new();
     if request_info.request_script.contains("add") {
-        tasks.insert(0, request_info.query_string);
         response.push_str("HTTP/1.0 200 OK\r\n");
         response.push_str("Server: HTTPQ\r\n");
         response.push_str("\r\n");
-        response.push_str("added ok");
+        if tasks.len() < 10000000 {
+            tasks.insert(0, request_info.query_string);
+            response.push_str("added ok");
+        } else {
+            response.push_str("queue full");
+        }
         response.push_str("\r\n");
     } else if request_info.request_script.contains("get") {
         response.push_str("HTTP/1.0 200 OK\r\n");
