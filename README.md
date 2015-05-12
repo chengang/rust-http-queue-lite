@@ -19,8 +19,8 @@ INSTALL
 ------
 
     curl -s http://static.rust-lang.org/rustup.sh | sh
-    wget https://github.com/chengang/rust-http-queue-lite/archive/v1.1.tar.gz
-    tar xvf v1.1.tar.gz
+    wget https://github.com/chengang/rust-http-queue-lite/archive/1.1.tar.gz
+    tar xvf 1.1.tar.gz
     cd rust-http-queue-lite-1.1/
     cargo build --release
     install target/release/http-queue-lite /usr/sbin/
@@ -41,27 +41,27 @@ PERFORMANCE
     siege -b -c 300 -r 300 "http://127.0.0.1:4321/add?task1"
     Transactions:          90000 hits
     Availability:         100.00 %
-    Elapsed time:          24.22 secs
+    Elapsed time:          15.62 secs
     Data transferred:         0.86 MB
-    Response time:            0.08 secs
-    Transaction rate:      3715.94 trans/sec
-    Throughput:           0.04 MB/sec
-    Concurrency:          298.80
+    Response time:            0.05 secs
+    Transaction rate:      5761.84 trans/sec
+    Throughput:           0.05 MB/sec
+    Concurrency:          298.49
     Successful transactions:       90000
     Failed transactions:             0
-    Longest transaction:          0.12
+    Longest transaction:          0.09
     Shortest transaction:         0.00
 
     siege -b -c 300 -r 300 "http://127.0.0.1:4321/get"
     Transactions:          90000 hits
     Availability:         100.00 %
-    Elapsed time:          14.31 secs
+    Elapsed time:           6.64 secs
     Data transferred:         0.60 MB
-    Response time:            0.05 secs
-    Transaction rate:      6289.31 trans/sec
-    Throughput:           0.04 MB/sec
-    Concurrency:          298.68
+    Response time:            0.02 secs
+    Transaction rate:     13554.22 trans/sec
+    Throughput:           0.09 MB/sec
+    Concurrency:          297.91
     Successful transactions:       90000
     Failed transactions:             0
-    Longest transaction:          0.06
+    Longest transaction:          0.03
     Shortest transaction:         0.00
