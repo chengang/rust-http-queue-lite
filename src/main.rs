@@ -192,8 +192,8 @@ fn handle_client(mut stream: TcpStream, mut tasks: MutexGuard<Vec<String>>) {
                        Server: HTTPQ\r\n\
                        Content-Length: {}\r\n\
                        \r\n\
-                       {}\r\n", 
-                       status, body.len()+2, body);
+                       {}", 
+                       status, body.len(), body);
     let _ =  stream.write(response.as_bytes());
 }
 
